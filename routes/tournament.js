@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Tournament = require("../models/tournament");
 const Team = require("../models/Team");
+const User = require("../models/user");
 const authenticateToken = require("../utils/middlewares/authenticationToken");
 // Ruta para crear un torneo
 router.post("/create-tournament", async (req, res) => {
@@ -63,7 +64,9 @@ router.patch("/add-team", authenticateToken, async (req, res) => {
     // Añadir el equipo al torneo
     tournament.teams.push(team.id);
     await tournament.save();
-
+    await User.findByIdAndUpdate(req.user.id, {
+      $push: { teams: team.id },
+    });
     res.status(200).json({ message: "Equipo añadido al torneo con éxito" });
   } catch (err) {
     console.error("Error al añadir el equipo al torneo:", err);

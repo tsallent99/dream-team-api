@@ -7,7 +7,6 @@ const User = require("../models/user");
 // Ruta para crear un equipo
 router.post("/create-team", authenticateToken, async (req, res) => {
   const { name, balance, players, tournamentId } = req.body;
-  console.log(name, balance, players, tournamentId);
   try {
     // Validar datos requeridos
     if (!name || balance === undefined || !players || !tournamentId) {
@@ -30,7 +29,7 @@ router.post("/create-team", authenticateToken, async (req, res) => {
     await tournament.save();
     // Opcional: Puedes asociar el equipo con el usuario que lo creó
     await User.findByIdAndUpdate(req.user.id, {
-      $push: { teams: newTeam.id },
+      $push: { teams: newTeam.id, tournaments: tournament.id },
     });
 
     res.status(201).json(newTeam);
