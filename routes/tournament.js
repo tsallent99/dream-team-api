@@ -81,4 +81,47 @@ router.get("/get-tournaments", async (req, res) => {
   }
 });
 
+router.get("get-tournament", async (req, res) => {
+  const { tournamentId } = req.body;
+  if (!tournamentId) {
+    return res.status(400).json({ message: "ID del torneo no proporcionado" });
+  }
+  try {
+    const tournament = await Tournament.findById(tournamentId);
+
+    if (!tournament) {
+      return res.status(404).json({ message: "Torneo no encontrado" });
+    }
+    res.status(200).json(tournament);
+  } catch (err) {
+    console.error("Error al obtener el torneo:", err);
+    res.status(500).json({ message: "Error al obtener el torneo" });
+  }
+});
+
+router.get("/get-tournaments-by-id", async (req, res) => {
+  try {
+    const { tournamentIds } = req.body;
+
+    if (!tournamentIds || !Array.isArray(tournamentIds)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid tournament IDs provided" });
+    }
+
+    const tournaments = await Tournament.find({ _id: { $in: tournamentIds } });
+
+    if (!tournaments.length) {
+      return res
+        .status(404)
+        .json({ message: "No tournaments found for the provided IDs" });
+    }
+
+    res.status(200).json(tournaments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
 module.exports = router;
