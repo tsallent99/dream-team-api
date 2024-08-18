@@ -104,15 +104,14 @@ router.get("get-tournament", async (req, res) => {
 
 router.get("/get-tournaments-by-id", async (req, res) => {
   try {
-    const { tournamentIds } = req.body;
-
-    if (!tournamentIds || !Array.isArray(tournamentIds)) {
+    const ids = req.query.ids ? req.query.ids.split(",") : [];
+    if (!ids || !Array.isArray(ids)) {
       return res
         .status(400)
         .json({ message: "Invalid tournament IDs provided" });
     }
 
-    const tournaments = await Tournament.find({ _id: { $in: tournamentIds } });
+    const tournaments = await Tournament.find({ _id: { $in: ids } });
 
     if (!tournaments.length) {
       return res
